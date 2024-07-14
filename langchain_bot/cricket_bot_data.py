@@ -14,10 +14,12 @@ from langchain_community.document_loaders import WikipediaLoader
 from langchain.chains.query_constructor.base import AttributeInfo
 from langchain.retrievers.self_query.base import SelfQueryRetriever
 from langchain_core.runnables import RunnableLambda, RunnableAssign, RunnablePassthrough
+from dotenv import load_dotenv
 
+load_dotenv()
+print(os.getenv('NVIDIA_API_KEY'))
+os.environ["NVIDIA_API_KEY"] = os.getenv('NVIDIA_API_KEY')
 
-api_key = "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"
-os.environ["NVIDIA_API_KEY"] = api_key
 
 console = Console()
 base_style = Style(color="#76B900", bold=True)
@@ -40,7 +42,7 @@ class WikipediaDocumentProcessor:
         self.docs = []
         self.all_chunks = []
         self.embeddings_model = CohereEmbeddings(
-            cohere_api_key="e1IuTgpykw6D9vTK8cm3uvID3gvEBZVjpQhY6Rjc")
+            cohere_api_key=os.getenv('COHERE_API_KEY'))
         self.vectorstore = None
 
     def load_documents(self):
@@ -99,7 +101,7 @@ class WikipediaDocumentProcessor:
 class CricketAssistant:
     def __init__(self, vectorstore):
         self.embeddings_model = CohereEmbeddings(
-            cohere_api_key="e1IuTgpykw6D9vTK8cm3uvID3gvEBZVjpQhY6Rjc")
+            cohere_api_key=os.getenv('COHERE_API_KEY'))
         self.vectorstore = vectorstore
         self.initialize_retriever()
         self.memory = deque(maxlen=5)

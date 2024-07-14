@@ -1,2 +1,4 @@
-env
+/env
 __pycache__
+/frontend/node_modules
+.env

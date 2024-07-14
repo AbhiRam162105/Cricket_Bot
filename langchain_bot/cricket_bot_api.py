@@ -1,8 +1,18 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from pydantic import BaseModel
 import uvicorn
 from cricket_bot_data import WikipediaDocumentProcessor, CricketAssistant
+
+# Define your CORS policy
+# Replace "*" with your specific origin(s) in production
+CORS_POLICY = {
+    "allow_origins": ["*"],
+    "allow_credentials": True,
+    "allow_methods": ["*"],
+    "allow_headers": ["*"],
+}
 
 
 @asynccontextmanager
@@ -16,8 +26,14 @@ async def lifespan(app: FastAPI):
     print("Initialization complete.")
     yield
     print("Shutting Down.... Adios!!")
-    
+
 app = FastAPI(lifespan=lifespan)
+
+# Add the CORSMiddleware to your FastAPI application
+app.add_middleware(
+    CORSMiddleware,
+    **CORS_POLICY
+)
 
 
 class UserInput(BaseModel):
@@ -34,7 +50,6 @@ async def chat_endpoint(user_input: UserInput):
     assistant = CricketAssistant(vector_store)
     response = assistant.handle_user_input(user_input.text)
     return {"response": response}
-
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
