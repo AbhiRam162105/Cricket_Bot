@@ -20,14 +20,8 @@ const createAPIInstance = () => {
         }
 
         const result = await response.json(); // Parse JSON response
-
-        // Check if it's the first call
-        if (isFirstCall) {
-          isFirstCall = false; // Mark as not the first call
-          return "hello"; // Return "hello" only on the first call
-        } else {
-          return result.response; // Return the parsed result for subsequent calls
-        }
+        console.log(result);
+        return result.response; // Return the parsed result for subsequent calls
       } catch (error) {
         console.error("There was a problem with the fetch operation:", error);
         return null; // Or handle the error appropriately

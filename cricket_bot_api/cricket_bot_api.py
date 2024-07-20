@@ -47,6 +47,7 @@ async def health():
 
 @app.post("/chat")
 async def chat_endpoint(user_input: UserInput):
+    print(user_input)
     assistant = CricketAssistant(vector_store)
     response = assistant.handle_user_input(user_input.text)
     return {"response": response}

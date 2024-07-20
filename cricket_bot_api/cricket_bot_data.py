@@ -3,6 +3,7 @@ from tqdm import tqdm
 from rich.style import Style
 from collections import deque
 from functools import partial
+from dotenv import load_dotenv
 from rich.console import Console
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
@@ -14,7 +15,7 @@ from langchain_community.document_loaders import WikipediaLoader
 from langchain.chains.query_constructor.base import AttributeInfo
 from langchain.retrievers.self_query.base import SelfQueryRetriever
 from langchain_core.runnables import RunnableLambda, RunnableAssign, RunnablePassthrough
-from dotenv import load_dotenv
+
 
 load_dotenv()
 print(os.getenv('NVIDIA_API_KEY'))
@@ -106,7 +107,7 @@ class CricketAssistant:
         self.initialize_retriever()
         self.memory = deque(maxlen=5)
         self.llm = ChatNVIDIA(
-            model="mistralai/mistral-7b-instruct-v0.2") | StrOutputParser()
+            model="mistralai/mixtral-8x22b-instruct-v0.1") | StrOutputParser()
 
     def initialize_retriever(self):
         metadata_field_info = [
@@ -127,11 +128,11 @@ class CricketAssistant:
         self.memory.append({"question": user_question, "response": response})
 
     def generate_embeddings(self, input_data):
+        pprint(input_data)
         embeddings = self.retriever.invoke(input_data)
         if embeddings:
-            return embeddings
-        else:
-            return "No data available"
+            return embeddings[:2]
+        return "No data available"
 
     def generate_embeddings_query(self, input_data):
         prompt = ChatPromptTemplate.from_template("""
@@ -147,7 +148,8 @@ Generate only a query sentence and nothing else from the user's question to fetc
             return "Process failed"
 
     def get_response(self, prompt):
-        return self.llm.invoke(prompt)
+        response = self.llm.invoke(prompt)
+        return response
 
     def handle_user_input(self, user_input):
         sys_msg = """
@@ -180,6 +182,7 @@ Previous Conversation memory: {{memory}}
 Your Response:
 """
             )})
+            | PPrint()
             | RunnableAssign({"response": lambda x: self.get_response(x["prompt"])})
             | RunnableAssign({"memory": lambda x: self.update_memory(x["input"]["input"], x["response"])})
         )
