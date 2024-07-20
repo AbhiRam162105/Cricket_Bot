@@ -9,7 +9,7 @@ const createAPIInstance = () => {
       try {
         if (isFirstCall) {
           isFirstCall = false; // Mark as not the first call
-          return "hello"; // Return "hello" only on the first call
+          return "Hello"; // Return "hello" only on the first call
         }
         const response = await fetch(url, {
           method: "POST", // Specify method
