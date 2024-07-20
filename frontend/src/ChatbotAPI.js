@@ -7,6 +7,10 @@ const createAPIInstance = () => {
       const data = { text: message };
 
       try {
+        if (isFirstCall) {
+          isFirstCall = false; // Mark as not the first call
+          return "hello"; // Return "hello" only on the first call
+        }
         const response = await fetch(url, {
           method: "POST", // Specify method
           headers: {
@@ -21,6 +25,7 @@ const createAPIInstance = () => {
 
         const result = await response.json(); // Parse JSON response
         console.log(result);
+
         return result.response; // Return the parsed result for subsequent calls
       } catch (error) {
         console.error("There was a problem with the fetch operation:", error);
